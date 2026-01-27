@@ -1,7 +1,19 @@
 class Sudoku:
-    def __init__(self, nom_fichier):
+    @classmethod
+    def from_grille(cls, grille):
+        return cls(grille)
+    
+    def __init__(self, nom_fichier=None):
         self.grille = [[0]*9 for _ in range(9)]
-        self.charger(nom_fichier)
+        if isinstance(nom_fichier, str):
+            self.charger(nom_fichier)
+        elif isinstance(nom_fichier, list):
+                    # Copie profonde de la grille
+            self.grille = [row[:] for row in nom_fichier]
+        else:
+            raise ValueError("Sudoku doit être initialisé avec un nom de fichier (str) ou une grille (list)")
+
+
 
     def charger(self, nom_fichier):
         """Charge la grille de Sudoku à partir d'un fichier texte."""
