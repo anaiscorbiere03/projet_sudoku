@@ -1,6 +1,6 @@
 
 import pygame
-from pygame.locals import QUIT, MOUSEBUTTONDOWN, KEYDOWN, K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_BACKSPACE, K_DELETE, K_RETURN
+from pygame.locals import QUIT, MOUSEBUTTONDOWN, KEYDOWN, K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_BACKSPACE, K_DELETE
 from projet_sudoku.solver import Sudoku
 from typing import List, Optional
 
@@ -109,6 +109,11 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
         bouton_text = font.render("Valider", True, (255,255,255) if grille_remplie else (100,100,100))
         text_rect = bouton_text.get_rect(center=bouton_rect.center)
         screen.blit(bouton_text, text_rect)
+            # Affichage du texte d'indice sous le bouton
+        indice_font = pygame.font.SysFont(None, 28)
+        indice_text = indice_font.render('Indice : appuyer sur "h" pour dévoiler une case', True, (50, 50, 50))
+        indice_rect = indice_text.get_rect(center=(TAILLE//2, bouton_y + bouton_height + 25))
+        screen.blit(indice_text, indice_rect)
 
         # Si le sudoku est fini et correct, afficher le temps final au centre et le nombre d'indices
         if final_time is not None:

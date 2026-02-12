@@ -1,4 +1,4 @@
-import pytest
+
 from projet_sudoku.solver import Sudoku
 from projet_sudoku.generateur import GenerateurSudoku
 
