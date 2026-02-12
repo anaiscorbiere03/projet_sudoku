@@ -1,4 +1,4 @@
-import pytest
+
 from projet_sudoku.generateur import GenerateurSudoku
 
 def test_remplir_grille():
