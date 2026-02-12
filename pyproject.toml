@@ -7,7 +7,9 @@ authors = [
     { name = "Anais Corbière", email = "anais.corbiere@etu.minesparis.psl.eu" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "pygame>=2.6.1",
+]
 
 [project.scripts]
 projet_sudoku = "projet_sudoku.main:main"
