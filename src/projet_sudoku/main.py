@@ -1,4 +1,4 @@
-import sys
+
 import copy
 import argparse
 from projet_sudoku.generateur import GenerateurSudoku
