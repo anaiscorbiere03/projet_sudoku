@@ -1,6 +1,6 @@
 
 import pygame
-from pygame.locals import QUIT, MOUSEBUTTONDOWN, KEYDOWN, K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_BACKSPACE, K_DELETE, K_RETURN
+from pygame.locals import QUIT, MOUSEBUTTONDOWN, KEYDOWN, K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_BACKSPACE, K_DELETE
 from projet_sudoku.solver import Sudoku
 from typing import List, Optional
 
