@@ -1,9 +1,0 @@
----FILEPATH src/projet_sudoku/py.typed
----FIND
-```
-```
----REPLACE
-```
-# This file indicates that the projet_sudoku module is typed.
-```
----COMPLETE
