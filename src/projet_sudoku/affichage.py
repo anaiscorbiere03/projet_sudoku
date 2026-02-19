@@ -19,6 +19,7 @@ COULEUR_ERREUR = (200, 0, 0)
 COULEUR_SELECTION = (180, 210, 255,60)
 
 
+
 def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
     """
     Affiche une grille de Sudoku et permet de jouer en mode graphique avec pygame.
@@ -26,6 +27,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
     Args:
         grille (list[list[int]]): Grille de Sudoku à afficher et à jouer.
     """
+    import logging
     pygame.init()
     screen = pygame.display.set_mode((TAILLE, TAILLE + 120))
     pygame.display.set_caption("Sudoku")
@@ -157,6 +159,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
         draw_grid(final_time=final_time_str, erreurs=erreurs)
         for event in pygame.event.get():
             if event.type == QUIT:
+                logging.info("Fermeture de la fenêtre de jeu par l'utilisateur.")
                 running = False
             elif event.type == MOUSEBUTTONDOWN:
                 x, y = event.pos
@@ -166,6 +169,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                     i, j = (y - offset_y) // CASE, (x - MARGE_X) // CASE
                     if 0 <= i < 9 and 0 <= j < 9 and modifiables[i][j]:
                         selected = (i, j)
+                        logging.info(f"Case sélectionnée par l'utilisateur : ({i}, {j})")
                 # Clic sur le bouton Valider
                 bouton_width, bouton_height = 180, 50
                 bouton_x = (TAILLE - bouton_width) // 2
@@ -173,6 +177,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                 bouton_rect = pygame.Rect(bouton_x, bouton_y, bouton_width, bouton_height)
                 grille_remplie = all(all(cell != 0 for cell in row) for row in user_grille)
                 if bouton_rect.collidepoint(x, y) and not finished and grille_remplie:
+                    logging.info("Bouton Valider cliqué par l'utilisateur.")
                     # Vérifier la grille
                     if check_valid():
                         finished = True
@@ -181,25 +186,28 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                         seconds = elapsed % 60
                         final_time_str = f"{minutes:02d}:{seconds:02d}"
                         erreurs = None
+                        logging.info(f"Grille validée correctement en {final_time_str}.")
                     else:
                         # Marquer les erreurs
                         erreurs = [[user_grille[i][j] != 0 and user_grille[i][j] != solution[i][j] for j in range(9)] for i in range(9)]
+                        logging.warning("Validation échouée : des erreurs sont présentes dans la grille.")
             elif event.type == KEYDOWN and selected and not finished:
+                i, j = selected
                 if event.key in [K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]:
                     val = event.key - K_0
-                    i, j = selected
                     user_grille[i][j] = val
+                    logging.info(f"Valeur {val} saisie par l'utilisateur en case ({i}, {j})")
                 elif event.key in [K_BACKSPACE, K_DELETE, K_0]:
-                    i, j = selected
                     user_grille[i][j] = 0
+                    logging.info(f"Effacement de la case ({i}, {j}) par l'utilisateur.")
                 # Fonctionnalité indice : touche 'h'
                 elif event.key == pygame.K_h:
-                    i, j = selected
                     if modifiables[i][j]:
                         user_grille[i][j] = solution[i][j]
                         if not indices_matrix[i][j]:
                             indices_matrix[i][j] = True
                             nb_indices += 1
+                            logging.info(f"Indice utilisé pour la case ({i}, {j})")
         if finished:
             draw_grid(final_time=final_time_str)
             pygame.time.wait(2500)
