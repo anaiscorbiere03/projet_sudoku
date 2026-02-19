@@ -18,7 +18,14 @@ COULEUR_VALID = (0, 200, 0)
 COULEUR_ERREUR = (200, 0, 0)
 COULEUR_SELECTION = (180, 210, 255,60)
 
+
 def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
+    """
+    Affiche une grille de Sudoku et permet de jouer en mode graphique avec pygame.
+    Permet la saisie des chiffres, la validation, l'affichage des erreurs et la demande d'indices.
+    Args:
+        grille (list[list[int]]): Grille de Sudoku à afficher et à jouer.
+    """
     pygame.init()
     screen = pygame.display.set_mode((TAILLE, TAILLE + 120))
     pygame.display.set_caption("Sudoku")
@@ -39,6 +46,12 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
     indices_matrix = [[False for _ in range(9)] for _ in range(9)]
 
     def draw_grid(final_time: Optional[str] = None, erreurs: Optional[List[List[bool]]] = None) -> None:
+        """
+        Dessine la grille de Sudoku, les chiffres, les erreurs, le timer, le bouton de validation et les indices.
+        Args:
+            final_time (str, optionnel): Temps final à afficher si la partie est terminée.
+            erreurs (list[list[bool]], optionnel): Matrice des erreurs à afficher en rouge.
+        """
         screen.fill(COULEUR_BG)
         # Timer
         if final_time is None:
@@ -109,7 +122,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
         bouton_text = font.render("Valider", True, (255,255,255) if grille_remplie else (100,100,100))
         text_rect = bouton_text.get_rect(center=bouton_rect.center)
         screen.blit(bouton_text, text_rect)
-            # Affichage du texte d'indice sous le bouton
+        # Affichage du texte d'indice sous le bouton
         indice_font = pygame.font.SysFont(None, 28)
         indice_text = indice_font.render('Indice : appuyer sur "h" pour dévoiler une case', True, (50, 50, 50))
         indice_rect = indice_text.get_rect(center=(TAILLE//2, bouton_y + bouton_height + 25))
