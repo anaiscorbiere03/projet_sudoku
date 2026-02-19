@@ -10,6 +10,12 @@ from projet_sudoku.affichage import afficher_sudoku_pygame  # Affichage graphiqu
 
 # Fonction utilitaire pour afficher une grille de Sudoku dans la console
 def afficher_grille(grille):
+    """
+    Affiche une grille de Sudoku dans la console de façon lisible.
+    Les zéros sont remplacés par des points et la grille est découpée en blocs 3x3.
+    Args:
+        grille (list[list[int]]): Grille de Sudoku à afficher.
+    """
     for i, ligne in enumerate(grille):
         # Affiche une ligne de séparation tous les 3 blocs
         if i % 3 == 0 and i != 0:
@@ -24,6 +30,11 @@ def afficher_grille(grille):
 
 # Fonction principale du programme
 def main():
+    """
+    Point d'entrée principal du programme.
+    Gère les arguments de la ligne de commande pour lancer soit le jeu graphique, soit l'affichage console.
+    Génère une grille de Sudoku, l'affiche et propose la résolution automatique si demandé.
+    """
     # Création du parser d'arguments pour la ligne de commande
     parser = argparse.ArgumentParser(
         description="Sudoku - Générateur et jeu graphique",

@@ -6,8 +6,13 @@ from projet_sudoku.solver import Sudoku  # Import du solveur pour vérifier l'un
 
 # Classe permettant de générer des grilles de Sudoku valides et uniques
 class GenerateurSudoku:
+    """
+    Classe permettant de générer des grilles de Sudoku valides et uniques.
+    """
     def __init__(self):
-        # Initialise une grille vide (9x9 remplie de zéros)
+        """
+        Initialise une nouvelle instance avec une grille vide (9x9 remplie de zéros).
+        """
         self.grille = [[0 for _ in range(9)] for _ in range(9)]
 
     def remplir_grille(self):
@@ -35,6 +40,12 @@ class GenerateurSudoku:
     def est_valide(self, i, j, val):
         """
         Vérifie si l'insertion de 'val' en position (i, j) respecte les règles du Sudoku.
+        Args:
+            i (int): Indice de ligne.
+            j (int): Indice de colonne.
+            val (int): Valeur à tester.
+        Returns:
+            bool: True si la valeur peut être placée, False sinon.
         """
         # Vérification de la ligne et de la colonne
         for k in range(9):
@@ -52,6 +63,8 @@ class GenerateurSudoku:
         """
         Retire nb_cases de la grille tout en gardant une unique solution.
         Pour chaque case retirée, on vérifie que la grille reste à solution unique.
+        Args:
+            nb_cases (int): Nombre de cases à retirer.
         """
         positions = [(i, j) for i in range(9) for j in range(9)]
         random.shuffle(positions)  # Mélange les positions pour retirer au hasard
@@ -71,6 +84,10 @@ class GenerateurSudoku:
     def generer(self, nb_cases_a_retirer=40):
         """
         Génère une nouvelle grille de Sudoku avec un nombre donné de cases retirées.
+        Args:
+            nb_cases_a_retirer (int): Nombre de cases à retirer pour créer la grille à résoudre.
+        Returns:
+            list[list[int]]: Grille de Sudoku générée.
         """
         self.remplir_grille()
         self.retirer_cases(nb_cases_a_retirer)
@@ -80,6 +97,8 @@ class GenerateurSudoku:
         """
         Sauvegarde la grille actuelle dans un fichier texte.
         Chaque ligne du fichier correspond à une ligne de la grille.
+        Args:
+            chemin (str): Chemin du fichier où sauvegarder la grille.
         """
         with open(chemin, 'w') as f:
             for ligne in self.grille:
