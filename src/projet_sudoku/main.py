@@ -68,11 +68,13 @@ def main():
         afficher_grille(grille)  # Affichage de la grille dans la console
         grille_a_resoudre = copy.deepcopy(grille)  # Copie de la grille pour la résolution
         sudoku = Sudoku(grille_a_resoudre)  # Création d'une instance du solveur
-        logging.debug("Résolution de la grille")
+        logging.info("Début de la résolution automatique de la grille")
         if sudoku.resoudre():
+            logging.info("La résolution automatique a abouti à une solution.")
             print("Solution :\n")
             afficher_grille(sudoku.grille)  # Affichage de la solution
             logging.info("Grille résolue avec succès")
         else:
+            logging.warning("La résolution automatique n'a trouvé aucune solution.")
             print("Aucune solution trouvée.")
             logging.warning("Échec de la résolution de la grille")
