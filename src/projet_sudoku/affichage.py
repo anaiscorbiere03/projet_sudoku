@@ -46,6 +46,12 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
     solution = sudoku_solver.grille
     nb_indices = 0
     indices_matrix = [[False for _ in range(9)] for _ in range(9)]
+    
+    # Position du bouton Valider
+    bouton_width, bouton_height = 180, 50
+    bouton_x = (TAILLE - bouton_width) // 2
+    bouton_y = 40 + 9*CASE + 25
+    bouton_rect = pygame.Rect(bouton_x, bouton_y, bouton_width, bouton_height)
 
     def draw_grid(final_time: Optional[str] = None, erreurs: Optional[List[List[bool]]] = None) -> None:
         """
@@ -55,6 +61,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
             erreurs (list[list[bool]], optionnel): Matrice des erreurs à afficher en rouge.
         """
         screen.fill(COULEUR_BG)
+
         # Timer
         if final_time is None:
             elapsed = (pygame.time.get_ticks() - start_ticks) // 1000
@@ -62,6 +69,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
             seconds = elapsed % 60
             timer_text = timer_font.render(f"Temps : {minutes:02d}:{seconds:02d}", True, (50, 50, 50))
             screen.blit(timer_text, (TAILLE//2 - 60, 10))
+
         # Décaler la grille vers le bas pour le timer
         offset_y = 40
         offset_x = MARGE_X
@@ -71,7 +79,7 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                 rect = pygame.Rect(offset_x + j*CASE, offset_y + i*CASE, CASE, CASE)
                 color = COULEUR_FIXE if not modifiables[i][j] else COULEUR_MODIFIABLE
                 pygame.draw.rect(screen, color, rect)
-                pygame.draw.rect(screen, (180,180,180), rect, 1)  # fine border for each cell
+                pygame.draw.rect(screen, (180,180,180), rect, 1)  
                 if user_grille[i][j] != 0:
                     # Si erreurs, afficher en rouge les chiffres incorrects
                     if erreurs and erreurs[i][j]:
@@ -81,9 +89,11 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                     else:
                         txt = font.render(str(user_grille[i][j]), True, COULEUR_TEXTE)
                     screen.blit(txt, (offset_x + j*CASE+CASE//3, offset_y + i*CASE+CASE//6))
-        # Colorier la ligne et la colonne sélectionnées APRÈS le dessin des cases
+
+        # Colorier la ligne et la colonne sélectionnées APRÈS le dessin des cases (pour que ça se voit)
         if selected:
             sel_i, sel_j = selected
+            
             # Surface temporaire avec alpha, taille de la grille uniquement
             highlight = pygame.Surface((9*CASE, 9*CASE), pygame.SRCALPHA)
             # Ligne
@@ -102,35 +112,88 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
             pygame.draw.rect(screen, COULEUR_VALID, (offset_x, offset_y, 9*CASE, 9*CASE), 8)
 
         # DESSIN DES LIGNES (fines puis épaisses) JUSTE AVANT L'AFFICHAGE
-        # D'abord toutes les lignes fines
+        # Efface l'écran et met le fond blanc
+        screen.fill(COULEUR_BG)
+
+        # Affichage du timer en haut
+        if final_time is None:
+            elapsed = (pygame.time.get_ticks() - start_ticks) // 1000
+            minutes = elapsed // 60
+            seconds = elapsed % 60
+            timer_text = timer_font.render(f"Temps : {minutes:02d}:{seconds:02d}", True, (50, 50, 50))
+            screen.blit(timer_text, (TAILLE//2 - 60, 10))
+
+        # Paramètres de position pour la grille
+        offset_y = 40
+        offset_x = MARGE_X
+        COULEUR_INDICE = (30, 60, 180)
+
+        # Dessin des cases de la grille
+        for i in range(9):
+            for j in range(9):
+                rect = pygame.Rect(offset_x + j*CASE, offset_y + i*CASE, CASE, CASE)
+                color = COULEUR_FIXE if not modifiables[i][j] else COULEUR_MODIFIABLE
+                pygame.draw.rect(screen, color, rect)
+                pygame.draw.rect(screen, (180,180,180), rect, 1) 
+                # Affichage du chiffre dans la case
+                if user_grille[i][j] != 0:
+                    # Si erreurs, afficher en rouge les chiffres incorrects
+                    if erreurs and erreurs[i][j]:
+                        txt = font.render(str(user_grille[i][j]), True, COULEUR_ERREUR)
+                    elif indices_matrix[i][j]:
+                        txt = font.render(str(user_grille[i][j]), True, COULEUR_INDICE)
+                    else:
+                        txt = font.render(str(user_grille[i][j]), True, COULEUR_TEXTE)
+                    screen.blit(txt, (offset_x + j*CASE+CASE//3, offset_y + i*CASE+CASE//6))
+
+        # Mise en surbrillance de la ligne et colonne sélectionnées
+        if selected:
+            sel_i, sel_j = selected
+            # Surface temporaire avec alpha, taille de la grille uniquement
+            highlight = pygame.Surface((9*CASE, 9*CASE), pygame.SRCALPHA)
+            # Ligne
+            for j in range(9):
+                rect = pygame.Rect(j*CASE, sel_i*CASE, CASE, CASE)
+                pygame.draw.rect(highlight, COULEUR_SELECTION, rect)
+            # Colonne
+            for i in range(9):
+                if i != sel_i:
+                    rect = pygame.Rect(sel_j*CASE, i*CASE, CASE, CASE)
+                    pygame.draw.rect(highlight, COULEUR_SELECTION, rect)
+            screen.blit(highlight, (offset_x, offset_y))
+            # Bordure de la case sélectionnée
+            pygame.draw.rect(screen, (100, 100, 255), (offset_x + sel_j*CASE, offset_y + sel_i*CASE, CASE, CASE), 3)
+
+        # Affichage d'une bordure verte si la partie est finie
+        if finished:
+            pygame.draw.rect(screen, COULEUR_VALID, (offset_x, offset_y, 9*CASE, 9*CASE), 8)
+
+        # Dessin des lignes de la grille (fines)
         for i in range(10):
             pygame.draw.line(screen, COULEUR_LIGNE, (offset_x, offset_y + i*CASE), (offset_x + 9*CASE, offset_y + i*CASE), 2)
             pygame.draw.line(screen, COULEUR_LIGNE, (offset_x + i*CASE, offset_y), (offset_x + i*CASE, offset_y + 9*CASE), 2)
 
-        # Puis toutes les lignes épaisses pour les blocs 3x3
+        # Dessin des lignes épaisses pour les blocs 3x3
         for i in [0, 3, 6, 9]:
             pygame.draw.line(screen, COULEUR_LIGNE_BLOC, (offset_x, offset_y + i*CASE), (offset_x + 9*CASE, offset_y + i*CASE), 6)
             pygame.draw.line(screen, COULEUR_LIGNE_BLOC, (offset_x + i*CASE, offset_y), (offset_x + i*CASE, offset_y + 9*CASE), 6)
 
-        # Bouton Valider centré et grisé si la grille n'est pas remplie
-        bouton_width, bouton_height = 180, 50
-        bouton_x = (TAILLE - bouton_width) // 2
-        bouton_y = offset_y + 9*CASE + 25
-        bouton_rect = pygame.Rect(bouton_x, bouton_y, bouton_width, bouton_height)
-        # Grisé si la grille n'est pas remplie
+        # Affichage du bouton Valider
+        # Si il n'y a plus aucun 0 alors la grille est considérée comme remplie, on met le bouton en bleu
         grille_remplie = all(all(cell != 0 for cell in row) for row in user_grille)
         couleur_bouton = (0, 120, 200) if grille_remplie else (180, 180, 180)
         pygame.draw.rect(screen, couleur_bouton, bouton_rect, border_radius=10)
         bouton_text = font.render("Valider", True, (255,255,255) if grille_remplie else (100,100,100))
         text_rect = bouton_text.get_rect(center=bouton_rect.center)
         screen.blit(bouton_text, text_rect)
+
         # Affichage du texte d'indice sous le bouton
         indice_font = pygame.font.SysFont(None, 28)
         indice_text = indice_font.render('Indice : appuyer sur "h" pour dévoiler une case', True, (50, 50, 50))
         indice_rect = indice_text.get_rect(center=(TAILLE//2, bouton_y + bouton_height + 25))
         screen.blit(indice_text, indice_rect)
 
-        # Si le sudoku est fini et correct, afficher le temps final au centre et le nombre d'indices
+        # Affichage du message de fin si le sudoku est terminé
         if final_time is not None:
             big_font = pygame.font.SysFont(None, 44)
             small_font = pygame.font.SysFont(None, 28)
@@ -143,64 +206,58 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
             screen.blit(chrono_text, chrono_text.get_rect(center=(center_x, center_y)))
             screen.blit(indices_text, indices_text.get_rect(center=(center_x, center_y + 35)))
 
+        # Mise à jour de l'affichage
         pygame.display.flip()
 
-    def check_valid() -> bool:
-        for i in range(9):
-            for j in range(9):
-                if user_grille[i][j] != solution[i][j]:
-                    return False
-        return True
-
+    # Boucle principale d'événements
     running = True
-    final_time_str = None
-    erreurs = None
     while running:
-        draw_grid(final_time=final_time_str, erreurs=erreurs)
         for event in pygame.event.get():
             if event.type == QUIT:
-                logging.info("Fermeture de la fenêtre de jeu par l'utilisateur.")
                 running = False
             elif event.type == MOUSEBUTTONDOWN:
                 x, y = event.pos
+                offset_x = MARGE_X
                 offset_y = 40
-                # Clic sur la grille
-                if not finished and offset_y <= y < offset_y + 9*CASE and MARGE_X <= x < MARGE_X + 9*CASE:
-                    i, j = (y - offset_y) // CASE, (x - MARGE_X) // CASE
-                    if 0 <= i < 9 and 0 <= j < 9 and modifiables[i][j]:
+                if offset_x <= x < offset_x + 9*CASE and offset_y <= y < offset_y + 9*CASE:
+                    j = (x - offset_x) // CASE
+                    i = (y - offset_y) // CASE
+                    if modifiables[i][j]:
                         selected = (i, j)
-                        logging.info(f"Case sélectionnée par l'utilisateur : ({i}, {j})")
-                # Clic sur le bouton Valider
-                bouton_width, bouton_height = 180, 50
-                bouton_x = (TAILLE - bouton_width) // 2
-                bouton_y = offset_y + 9*CASE + 25
-                bouton_rect = pygame.Rect(bouton_x, bouton_y, bouton_width, bouton_height)
-                grille_remplie = all(all(cell != 0 for cell in row) for row in user_grille)
-                if bouton_rect.collidepoint(x, y) and not finished and grille_remplie:
-                    logging.info("Bouton Valider cliqué par l'utilisateur.")
-                    # Vérifier la grille
-                    if check_valid():
+                elif bouton_rect.collidepoint(event.pos) and all(all(cell != 0 for cell in row) for row in user_grille):
+                    # Vérifier les erreurs faites par l'utilisateur
+                    erreurs = [[False for _ in range(9)] for _ in range(9)]
+
+                    #on regarde pour chaque case si la valeur saisie par l'utilisateur est différente de la solution
+                    for i in range(9):
+                        for j in range(9):
+                            if user_grille[i][j] != solution[i][j]:
+                                erreurs[i][j] = True
+                    if any(any(row) for row in erreurs):
+                        draw_grid(erreurs=erreurs)
+                    else:
                         finished = True
                         elapsed = (pygame.time.get_ticks() - start_ticks) // 1000
                         minutes = elapsed // 60
                         seconds = elapsed % 60
                         final_time_str = f"{minutes:02d}:{seconds:02d}"
-                        erreurs = None
-                        logging.info(f"Grille validée correctement en {final_time_str}.")
-                    else:
-                        # Marquer les erreurs
-                        erreurs = [[user_grille[i][j] != 0 and user_grille[i][j] != solution[i][j] for j in range(9)] for i in range(9)]
-                        logging.warning("Validation échouée : des erreurs sont présentes dans la grille.")
-            elif event.type == KEYDOWN and selected and not finished:
+            
+            # Gestion de la saisie au clavier pour les chiffres, l'effacement et les indices
+            elif event.type == KEYDOWN and selected:
                 i, j = selected
-                if event.key in [K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]:
+
+                # Saisie des chiffres 1 à 9
+                if K_1 <= event.key <= K_9:
                     val = event.key - K_0
                     user_grille[i][j] = val
                     logging.info(f"Valeur {val} saisie par l'utilisateur en case ({i}, {j})")
+
+                # Effacer la case avec Backspace, Delete ou 0
                 elif event.key in [K_BACKSPACE, K_DELETE, K_0]:
                     user_grille[i][j] = 0
                     logging.info(f"Effacement de la case ({i}, {j}) par l'utilisateur.")
-                # Fonctionnalité indice : touche 'h'
+
+                # Indice avec la touche "h"
                 elif event.key == pygame.K_h:
                     if modifiables[i][j]:
                         user_grille[i][j] = solution[i][j]
@@ -208,8 +265,13 @@ def afficher_sudoku_pygame(grille: List[List[int]]) -> None:
                             indices_matrix[i][j] = True
                             nb_indices += 1
                             logging.info(f"Indice utilisé pour la case ({i}, {j})")
+        
+        # Si la partie est terminée, afficher la grille finale avec le temps et les indices utilisés, puis attendre avant de fermer
         if finished:
             draw_grid(final_time=final_time_str)
             pygame.time.wait(2500)
             running = False
+        else:
+            draw_grid()
+    
     pygame.quit()

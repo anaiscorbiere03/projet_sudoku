@@ -75,14 +75,26 @@ class Sudoku:
         """
         tab=[True]*10
         b=self.bloc(i,j)
+        #boucle sur les 9 cases de la ligne, colonne, et bloc
         for k in range(9):
+
+            #si il y a déjà une valeur non nulle dans la case numéro k de la même ligne, 
+            #noter qu'elle ne peut pas être attribuée à la case (i, j)
             if k!=j and self.grille[i][k]!=0:
                  tab[self.grille[i][k]]=False
+            
+            #si il y a déjà une valeur non nulle dans la case numéro k de la même colonne,
+            #noter qu'elle ne peut pas être attribuée à la case (i, j)
             if k!=i and self.grille[k][j]!=0:
                  tab[self.grille[k][j]]=False
+
+            #si il y a déjà une valeur non nulle dans la case numéro k du même bloc,
+            #noter qu'elle ne peut pas être attribuée à la case (i, j)
             x,y=self.indices(b,k)
             if (x,y)!= (i,j) and self.grille[x][y]!=0:
                 tab[self.grille[x][y]]=False
+
+        # Dans tab, les indices des valeurs jouables sont ceux qui restent True: on les retourne donc.
         return [n for n in range(1,10) if tab[n]]
     
     def next_coup(self):
@@ -93,13 +105,21 @@ class Sudoku:
         """
         case=(-1,-1)
         liste=[i for i in range(9)]
+
+        #on parcourt toutes les cases de la grille 9x9
         for i in range(9):
             for j in range(9):
+
+                #si la case (i, j) est vide, on cherche les coups jouables (et donc aussi leur nombre)
                 if self.grille[i][j]==0:
                     jouables=self.coups_jouables(i,j)
+
+                    #on regarde si cette case a moins de coups jouables que la précédente (ou si c'est la première case vide rencontrée)
                     if case==(-1,-1) or len(jouables)<len(liste):
                         case=(i,j)
                         liste=jouables
+
+        #on renvoie la case choisie et la liste de ses coups jouables pour un backtracking efficace
         return case,liste
 
 
